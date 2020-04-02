@@ -1,0 +1,6 @@
+{
+  "Semicolons" : true,
+  "singleQuote": true,
+  "bracketSpacing": true,
+  "printWidth": 80
+}
