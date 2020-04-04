@@ -5,7 +5,6 @@ const AppError = require('./../utils/appError');
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const sendEmail = require('./../utils/email');
-
 const signToken = id => {
   return jwt.sign(
     {
@@ -18,7 +17,7 @@ const signToken = id => {
   );
 };
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, res, req) => {
   const token = signToken(user._id);
 
   const cookieOptions = {
@@ -29,7 +28,11 @@ const createSendToken = (user, statusCode, res) => {
   };
 
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-  res.cookie('jwt', token, cookieOptions);
+  /////////////////////////////////////////
+  req.session.jwt = token;
+  //  res.cookie('jwt', token, cookieOptions);
+  /////////////////////////////////////////
+
   user.password = undefined;
   return res.status(statusCode).json({
     status: 'success',
@@ -69,7 +72,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
   // 3) if everything ok , send token to client
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, res, req);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
